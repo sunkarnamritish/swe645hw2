@@ -1,20 +1,12 @@
 pipeline {
     agent any
-    environment {
-        PROJECT_ID = 'swe645hw2'
-        CLUSTER_NAME = 'swe645hw2'
-        LOCATION = 'us-east-1a'
-    }
     stages {
-        stage("Checkout code") {
-            steps {
-                checkout scm
-            }
-        }
+        
        
         stage("Build image") {
             steps {
                 script {
+		    checkout scm
                     myapp = docker.build("sucharan/studentsurvey:${env.BUILD_ID}")
                 }
             }
@@ -31,7 +23,7 @@ pipeline {
 			steps{
 				sh 'kubectl config view'
 				sh "kubectl get deployments"
-				sh "kubectl set image deployment/swe645deployment container-0=sucharan/studentsurvey:${env.BUILD_ID}"
+				sh "kubectl set image deployment/hw2dep645 container-0=sucharan/studentsurvey:${env.BUILD_ID}"
 			}
 		}
     }    
