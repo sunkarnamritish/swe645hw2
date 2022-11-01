@@ -13,9 +13,7 @@ pipeline {
         }
         stage('BuildWAR') {
             steps {
-            
-            	dir('src/main/webapp') {
-            		echo 'Creating the Jar ...'
+            	echo 'Creating the Jar ...'
 					sh 'java -version'
 					sh 'jar -cvf subhakar.war *'
             	}
