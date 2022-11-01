@@ -14,7 +14,7 @@ pipeline {
         stage('BuildWAR') {
             steps {
             
-            	dir('desktop') {
+            	dir('Jenkinsfile') {
             		echo 'Creating the Jar ...'
 					sh 'java -version'
 					sh 'jar -cvf subhakar.war *'
