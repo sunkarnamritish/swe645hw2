@@ -6,7 +6,7 @@ Pipeline {
 	stages{
 		stage('Build Maven'){
 			steps{
-				checkout($class: 'GitSCM', branches: [[name: '*/main]], extensions: [], userRemoteconfigs: [[url:'https://github.com/sunkarnamritish/645hw2']]])
+				checkout($class: 'GitSCM', branches: [[name: '*/main]], extensions: [], userRemoteconfigs: [[url: 'https://github.com/sunkarnamritish/645hw2']]])
 				sh 'man clean install'
 			}
 		}
