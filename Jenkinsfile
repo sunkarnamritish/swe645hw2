@@ -1,46 +1,35 @@
-pipeline {
-    agent any
-    environment {
-        PROJECT_ID = '645hw2'
-        CLUSTER_NAME = '645hw2'
-        LOCATION = 'us-east-1a'
-    }
-    stages {
-        stage("Checkout code") {
-            steps {
-                checkout scm
-            }
-        }
-        stage('BuildWAR') {
-            steps {
-            	echo 'Creating the Jar ...'
-					sh 'java -version'
-					sh 'jar -cvf subhakar.war *'
-            	}
-            }
-        }
-        
-        stage("Build image") {
-            steps {
-                script {
-                    myapp = docker.build(“sucharan/645hw2:${env.BUILD_ID}")
-                }
-            }
-        }
-        stage("Push image") {
-            steps {
-                script {
-                	sh 'docker login -u Sucharan -p Roommates@4309'
-					myapp.push("${env.BUILD_ID}")
-                }
-            }
-        }        
-        stage("UpdateDeployment") {
+Pipeline {
+	agent any 
+	tools {
+		maven '3.8.6'
+	}
+	stages{
+		stage('Build Maven'){
 			steps{
-				sh 'kubectl config view'
-				sh "kubectl get deployments"
-				sh "kubectl set image deployment/swe645deployment container-0=sucharan/645hw2:${env.BUILD_ID}"
+				checkout($class: 'GitSCM', branches: [[name: '*/main]], extensions: [], userRemoteconfigs: [[url:'https://github.com/sunkarnamritish/645hw2']]])
+				sh 'man clean install'
 			}
 		}
-    }    
+		stage('Build Docker Image'){
+			steps{
+				script{
+					docker.build("sucharan/studentsurvey:${env.BUILD_NUMBER}")
+				}
+			}
+		}
+		stage('Push Image To Hub'){
+			steps{
+				script{
+				sh "docker login -u sucharan -p Roommates@4309"
+				sh "docker push sucharan/studentsurvey:${env.BUILD_NUMBER}"
+				}
+			}
+		}
+		stage("Deploying To Kubernetes"){
+			steps{
+				script{
+					sh "kubectl set image deployment/swe654 swe645 swe645=sucharan/studentsurvery:${env.BUILD_NUMBER}"
+				}
+			}
+		}
 }
