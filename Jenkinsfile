@@ -1,48 +1,29 @@
 pipeline {
     agent any
-    environment {
-        PROJECT_ID = '645hw2'
-        CLUSTER_NAME = '645hw2'
-        LOCATION = 'us-east-1a'
-    }
+    
     stages {
-        stage("Checkout code") {
+        stage("compile code") {
             steps {
                 checkout scm
             }
         }
-        stage('BuildWAR') {
-            steps {
-            
-            	dir('src/main/webapp') {
-            		echo 'Creating the Jar ...'
-					sh 'java -version'
-					sh 'jar -cvf subhakar.war *'
-            	}
-            }
-        }
         
-        stage("Build image") {
+        stage("Docker Ops") {
             steps {
                 script {
-                    myapp = docker.build("sucharan/645hw2:latest")
+                    ourapp = docker.build("sucharan/ss:${env.BUILD_ID}")
+		    sh 'docker login -u Sucharan -p Roommates@4309'
+		    ourapp.push("${env.BUILD_ID}")
                 }
             }
         }
-        stage("Push image") {
-            steps {
-                script {
-                	sh 'docker login -u Sucharan -p Roommates@4309'
-					myapp.push("${env.BUILD_ID}")
-                }
-            }
-        }        
+                
         stage("UpdateDeployment") {
-			steps{
-				sh 'kubectl config view'
-				sh "kubectl get deployments"
-				sh "kubectl set image deployment/swe645deployment container-0=sucharan/645hw2:${env.BUILD_ID}"
-			}
-		}
+          steps{
+            sh 'kubectl config view'
+            sh "kubectl get deployments"
+            sh "kubectl set image deployment/subhakar.war container-0=sucharan/ss:${env.BUILD_ID}"
+          }
+		    }
     }    
 }
