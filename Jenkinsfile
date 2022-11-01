@@ -25,7 +25,7 @@ pipeline {
         stage("Build image") {
             steps {
                 script {
-                    myapp = docker.build(“sucharan/645hw2:${env.BUILD_ID}")
+                    myapp = docker.build(“sucharan/645hw2:latest")
                 }
             }
         }
